@@ -32,20 +32,26 @@ export const store = createStore({
         },
 
         deleteTaskLocal : (state,id) => {
-            const idx = state.tasks.findIndex(task => task.id == id);
-            if(idx != -1) state.tasks.splice(idx,1);
+            if(id){
+                const idx = state.tasks.findIndex(task => task.id == id);
+                if(idx != -1) state.tasks.splice(idx,1);
+            }
         },
 
         edit : (state,id) => {
-            const task = state.tasks.find(task => task.id == id);
-            if(task){
-                state.selected = task;
-                state.isEditing = true;
+            if(id){
+                const task = state.tasks.find(task => task.id == id);
+                if(task){
+                    state.selected = task;
+                    state.isEditing = true;
+                }
             }
         },
 
         updateSelected : (state,taskname) => {
-            state.selected.taskname = taskname;
+            if(taskname){
+                state.selected.taskname = taskname;
+            }
         },
 
         updateIsEditing : (state) => state.isEditing = false,
@@ -75,29 +81,35 @@ export const store = createStore({
 
         async add({commit},taskname){
 
-            const newtask = {
-                taskname,
-                isDone : false,
-            };
-
-            const doc = await addDoc(collectionDb,newtask);
-
-            commit('addTaskLocal',{
-                id:doc.id,
-                ...newtask
-            });
+            if(taskname){
+                const newtask = {
+                    taskname,
+                    isDone : false,
+                };
+    
+                const doc = await addDoc(collectionDb,newtask);
+    
+                commit('addTaskLocal',{
+                    id:doc.id,
+                    ...newtask
+                });
+            }
 
         },
 
 
         async delete({commit},id){
-            await deleteDoc(doc(db,'tasks',id));
-            commit('deleteTaskLocal',id);
+            if(id){
+                await deleteDoc(doc(db,'tasks',id));
+                commit('deleteTaskLocal',id);
+            }
         },
 
         async update({commit},taskname){
-            await updateDoc(doc(db,'tasks', this.state.selected.id), { taskname });
-            commit('updateSelected',taskname)
+            if(taskname){
+                await updateDoc(doc(db,'tasks', this.state.selected.id), { taskname });
+                commit('updateSelected',taskname)
+            }
         },
 
 
